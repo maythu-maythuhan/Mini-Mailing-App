@@ -1,0 +1,12 @@
+{
+  "name": "HEINEKEN Myanmar — Invitation Sender",
+  "short_name": "Invitations",
+  "description": "Prepare, preview, test, and send personalized invitations from your own mailbox.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f7f5",
+  "theme_color": "#00843d",
+  "icons": [
+    { "src": "/star.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
