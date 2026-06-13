@@ -231,3 +231,92 @@ export const UsersIcon = ({ size = 18, className }: P) => (
     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
+
+export const BoldIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M6 4h8a4 4 0 0 1 0 8H6z" />
+    <path d="M6 12h9a4 4 0 0 1 0 8H6z" />
+  </svg>
+);
+
+export const ItalicIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M19 4h-9" />
+    <path d="M14 20H5" />
+    <path d="M15 4 9 20" />
+  </svg>
+);
+
+export const UnderlineIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M6 4v6a6 6 0 0 0 12 0V4" />
+    <path d="M4 20h16" />
+  </svg>
+);
+
+export const StrikeIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M16 4H9a3 3 0 0 0-2.83 4" />
+    <path d="M14 12a4 4 0 0 1 0 8H6" />
+    <path d="M4 12h16" />
+  </svg>
+);
+
+export const ListBulletIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" />
+    <circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" />
+    <circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
+    <path d="M9 6h11" />
+    <path d="M9 12h11" />
+    <path d="M9 18h11" />
+  </svg>
+);
+
+export const ListOrderedIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M10 6h11" />
+    <path d="M10 12h11" />
+    <path d="M10 18h11" />
+    <path d="M4 6h1v4" />
+    <path d="M4 10h2" />
+    <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+  </svg>
+);
+
+export const HighlightIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="m9 11-6 6v3h3l6-6" />
+    <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4l8 8z" />
+  </svg>
+);
+
+export const LinkIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
+export const ClearFormatIcon = ({ size = 16, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M4 7V4h16v3" />
+    <path d="M5 20h6" />
+    <path d="M13 4 8 20" />
+    <path d="m15 15 5 5" />
+    <path d="m20 15-5 5" />
+  </svg>
+);
+
+export const SunIcon = ({ size = 18, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </svg>
+);
+
+export const MoonIcon = ({ size = 18, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </svg>
+);

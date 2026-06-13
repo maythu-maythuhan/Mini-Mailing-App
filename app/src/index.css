@@ -1672,6 +1672,47 @@ button.menu__row {
 .rich-wrap {
   position: relative;
 }
+
+/* Formatting toolbar */
+.fmt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: var(--bg-2);
+}
+.fmt-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--ink-2);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+}
+.fmt-btn:hover {
+  background: var(--line-2);
+  color: var(--ink);
+}
+.fmt-btn.is-active {
+  background: var(--green-soft);
+  color: var(--green-700);
+}
+.fmt-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--line);
+  margin: 0 3px;
+  flex: none;
+}
+
 .rich-body {
   width: 100%;
   min-height: 168px;
@@ -1679,7 +1720,7 @@ button.menu__row {
   overflow: auto;
   border: 1px solid var(--line);
   background: #fcfdfc;
-  border-radius: var(--radius-sm);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   padding: 11px 13px;
   font-size: 14px;
   line-height: 1.6;
@@ -1691,6 +1732,10 @@ button.menu__row {
   border-color: var(--green);
   background: #fff;
   box-shadow: var(--ring);
+}
+.rich-body:focus ~ * .fmt-toolbar,
+.fmt-toolbar:has(+ .rich-body:focus) {
+  border-color: var(--green);
 }
 .rich-body:empty::before {
   content: attr(data-placeholder);
@@ -1704,6 +1749,10 @@ button.menu__row {
   margin: 6px 0;
   display: block;
   cursor: pointer;
+}
+.rich-body a {
+  color: var(--green-700);
+  text-decoration: underline;
 }
 
 /* image selection + resize handles (Outlook-style) */
@@ -1905,4 +1954,225 @@ code {
     margin: auto 0;
     width: 100%;
   }
+}
+
+/* ============================================================
+   Dark mode
+   ============================================================ */
+[data-theme="dark"] {
+  /* Override CSS vars */
+  --ink: #ddeae3;
+  --ink-2: #a4c0b2;
+  --ink-3: #6b8c7a;
+  --line: #2b3d34;
+  --line-2: #223129;
+  --surface: #192520;
+  --bg: #0f1a14;
+  --bg-2: #1b2c22;
+
+  --green-soft: #0d2819;
+  --green-tint: #0a1f14;
+  --red-soft: #2c1110;
+  --amber-soft: #271d07;
+}
+
+/* Body background */
+[data-theme="dark"] body {
+  background:
+    radial-gradient(1200px 520px at 78% -8%, rgba(0, 132, 61, 0.07), transparent 60%),
+    radial-gradient(900px 480px at -8% 4%, rgba(0, 132, 61, 0.04), transparent 55%),
+    var(--bg);
+}
+
+/* Sticky header */
+[data-theme="dark"] .header {
+  background: rgba(15, 26, 20, 0.9);
+  border-bottom-color: var(--line);
+}
+
+/* Inputs and text areas */
+[data-theme="dark"] .input,
+[data-theme="dark"] .textarea {
+  background: #1e2e25;
+  color: var(--ink);
+}
+[data-theme="dark"] .input:focus,
+[data-theme="dark"] .textarea:focus {
+  background: #223529;
+}
+[data-theme="dark"] .input::placeholder,
+[data-theme="dark"] .textarea::placeholder {
+  color: #4d6b5c;
+}
+
+/* Rich body editor */
+[data-theme="dark"] .rich-body {
+  background: #1e2e25;
+  color: var(--ink);
+}
+[data-theme="dark"] .rich-body:focus {
+  background: #223529;
+}
+[data-theme="dark"] .rich-body:empty::before {
+  color: #4d6b5c;
+}
+[data-theme="dark"] .rich-body a {
+  color: #4ade80;
+}
+
+/* Editable cell inputs in recipient table */
+[data-theme="dark"] .cell-input {
+  color: var(--ink);
+}
+[data-theme="dark"] .cell-input:hover {
+  background: #243729;
+}
+[data-theme="dark"] .cell-input:focus {
+  background: #223529;
+}
+
+/* Recipient table */
+[data-theme="dark"] .rtable thead th {
+  background: #1b2c22;
+  color: var(--ink-3);
+}
+[data-theme="dark"] .rtable tbody tr:hover {
+  background: #1e2e25;
+}
+[data-theme="dark"] .rtable tbody tr.is-invalid {
+  background: #2a1510;
+}
+[data-theme="dark"] .rtable tbody tr.is-invalid:hover {
+  background: #301810;
+}
+
+/* Attachments */
+[data-theme="dark"] .attach {
+  background: #1e2e25;
+}
+
+/* Dropzone */
+[data-theme="dark"] .dropzone {
+  background: #1b2c22;
+}
+
+/* Empty state */
+[data-theme="dark"] .empty {
+  background: #1b2c22;
+}
+
+/* Add row inline form */
+[data-theme="dark"] .addrow {
+  background: #1b2c22;
+}
+
+/* Action bar */
+[data-theme="dark"] .actionbar__inner {
+  background: rgba(15, 26, 20, 0.94);
+}
+
+/* Modal actions footer */
+[data-theme="dark"] .modal__actions {
+  background: #1b2c22;
+}
+
+/* Stats in send console */
+[data-theme="dark"] .stat {
+  background: #1b2c22;
+}
+
+/* Microsoft sign-in button */
+[data-theme="dark"] .ms-btn {
+  background: #1e2e25;
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme="dark"] .ms-btn:hover {
+  background: #223529;
+  border-color: #3a5244;
+}
+
+/* Sign-in config box */
+[data-theme="dark"] .signin__config {
+  background: #1b2c22;
+}
+
+/* Recipient summary row */
+[data-theme="dark"] .recipient {
+  background: #1b2c22;
+}
+
+/* Demo banner border */
+[data-theme="dark"] .demo-banner {
+  border-color: #3a2e0a;
+}
+
+/* Paste textarea */
+[data-theme="dark"] .paste-area {
+  background: #1e2e25;
+  color: var(--ink);
+}
+[data-theme="dark"] .paste-area:focus {
+  background: #223529;
+}
+
+/* Icon buttons in header */
+[data-theme="dark"] .iconbtn {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+[data-theme="dark"] .iconbtn:hover {
+  background: var(--bg-2);
+  color: var(--ink);
+}
+
+/* Identity chip */
+[data-theme="dark"] .identity {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+/* Ghost button */
+[data-theme="dark"] .btn--ghost {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+[data-theme="dark"] .btn--ghost:hover:not(:disabled) {
+  background: var(--bg-2);
+  border-color: #3a5244;
+}
+
+/* Preview nav buttons */
+[data-theme="dark"] .preview-nav button {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+
+/* Modal close button */
+[data-theme="dark"] .modal__close {
+  background: var(--bg-2);
+  color: var(--ink-2);
+}
+[data-theme="dark"] .modal__close:hover {
+  background: var(--line);
+}
+
+/* Menu popover */
+[data-theme="dark"] .menu__row:hover {
+  background: var(--bg-2);
+}
+
+/* Code snippets */
+[data-theme="dark"] code {
+  background: #1b2c22;
+  color: var(--ink-2);
+}
+
+/* Toolbar format button active in dark */
+[data-theme="dark"] .fmt-btn.is-active {
+  background: var(--green-soft);
+  color: #4ade80;
 }

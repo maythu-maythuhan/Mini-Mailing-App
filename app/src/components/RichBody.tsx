@@ -8,10 +8,22 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { useCampaign } from "../state/campaign";
-import { ImageIcon } from "./icons";
+import {
+  BoldIcon,
+  ClearFormatIcon,
+  HighlightIcon,
+  ItalicIcon,
+  ImageIcon,
+  LinkIcon,
+  ListBulletIcon,
+  ListOrderedIcon,
+  StrikeIcon,
+  UnderlineIcon,
+} from "./icons";
 
 const PLACEHOLDERS = ["{{Name}}", "{{Company}}"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const HIGHLIGHT_COLOR = "#fef08a";
 
 type Corner = "nw" | "ne" | "sw" | "se";
 interface Box {
@@ -20,15 +32,17 @@ interface Box {
   w: number;
   h: number;
 }
+interface ActiveFmt {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  strike: boolean;
+  ul: boolean;
+  ol: boolean;
+  highlight: boolean;
+  link: boolean;
+}
 
-/**
- * Rich message editor (contentEditable). Accepts typed text, {{placeholders}},
- * and pasted / dropped images / screenshots embedded inline as data URLs.
- *
- * Inserted images are selectable and **resizable via drag handles**, like
- * Outlook. The body is stored as HTML in draft.body. The editor is uncontrolled
- * (innerHTML set imperatively) so the caret never jumps while typing.
- */
 export default function RichBody() {
   const { draft, setDraft, notify } = useCampaign();
   const draftRef = useRef(draft);
@@ -38,6 +52,11 @@ export default function RichBody() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [selImg, setSelImg] = useState<HTMLImageElement | null>(null);
   const [box, setBox] = useState<Box | null>(null);
+  const [active, setActive] = useState<ActiveFmt>({
+    bold: false, italic: false, underline: false,
+    strike: false, ul: false, ol: false,
+    highlight: false, link: false,
+  });
 
   // Sync external changes (template load) without disturbing the caret.
   useEffect(() => {
@@ -52,6 +71,30 @@ export default function RichBody() {
     const el = editorRef.current;
     if (el) setDraft({ ...draftRef.current, body: el.innerHTML });
   }, [setDraft]);
+
+  // Update toolbar active-state based on current selection.
+  const updateActive = useCallback(() => {
+    const sel = window.getSelection();
+    const anchor = sel?.anchorNode;
+    if (!editorRef.current?.contains(anchor ?? null)) return;
+    const hilite = document.queryCommandValue("hiliteColor");
+    const parentTag = anchor?.parentElement?.tagName;
+    setActive({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      underline: document.queryCommandState("underline"),
+      strike: document.queryCommandState("strikethrough"),
+      ul: document.queryCommandState("insertUnorderedList"),
+      ol: document.queryCommandState("insertOrderedList"),
+      highlight: hilite.includes("254") && hilite.includes("240") && hilite.includes("138"),
+      link: parentTag === "A",
+    });
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("selectionchange", updateActive);
+    return () => document.removeEventListener("selectionchange", updateActive);
+  }, [updateActive]);
 
   // Position the selection overlay over the selected image.
   const reposition = useCallback(() => {
@@ -174,6 +217,50 @@ export default function RichBody() {
     document.addEventListener("mouseup", onUp);
   }
 
+  // ---- formatting helpers ----
+
+  function fmt(cmd: string, val?: string) {
+    editorRef.current?.focus();
+    document.execCommand(cmd, false, val);
+    commit();
+    updateActive();
+  }
+
+  function toggleHighlight() {
+    editorRef.current?.focus();
+    const v = document.queryCommandValue("hiliteColor");
+    const isOn = v.includes("254") && v.includes("240") && v.includes("138");
+    document.execCommand("hiliteColor", false, isOn ? "transparent" : HIGHLIGHT_COLOR);
+    commit();
+    updateActive();
+  }
+
+  function insertLink() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) {
+      notify("info", "Select text first", "Highlight some text to turn it into a link.");
+      return;
+    }
+    const anchor = sel.anchorNode?.parentElement;
+    if (anchor?.tagName === "A") {
+      editorRef.current?.focus();
+      document.execCommand("unlink");
+      commit();
+      updateActive();
+      return;
+    }
+    const url = window.prompt("Enter URL:", "https://");
+    if (!url || url === "https://") return;
+    editorRef.current?.focus();
+    document.execCommand("createLink", false, url);
+    editorRef.current?.querySelectorAll<HTMLAnchorElement>("a:not([target])").forEach((a) => {
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+    });
+    commit();
+    updateActive();
+  }
+
   function insertToken(token: string) {
     insertNodeAtCaret(document.createTextNode(token));
   }
@@ -195,6 +282,94 @@ export default function RichBody() {
       </label>
 
       <div className="rich-wrap" ref={wrapRef}>
+        {/* Formatting toolbar */}
+        <div className="fmt-toolbar" onMouseDown={(e) => e.preventDefault()}>
+          <button
+            type="button"
+            className={`fmt-btn${active.bold ? " is-active" : ""}`}
+            onClick={() => fmt("bold")}
+            title="Bold (Ctrl+B)"
+          >
+            <BoldIcon size={14} />
+          </button>
+          <button
+            type="button"
+            className={`fmt-btn${active.italic ? " is-active" : ""}`}
+            onClick={() => fmt("italic")}
+            title="Italic (Ctrl+I)"
+          >
+            <ItalicIcon size={14} />
+          </button>
+          <button
+            type="button"
+            className={`fmt-btn${active.underline ? " is-active" : ""}`}
+            onClick={() => fmt("underline")}
+            title="Underline (Ctrl+U)"
+          >
+            <UnderlineIcon size={14} />
+          </button>
+          <button
+            type="button"
+            className={`fmt-btn${active.strike ? " is-active" : ""}`}
+            onClick={() => fmt("strikethrough")}
+            title="Strikethrough"
+          >
+            <StrikeIcon size={14} />
+          </button>
+
+          <span className="fmt-sep" />
+
+          <button
+            type="button"
+            className={`fmt-btn${active.highlight ? " is-active" : ""}`}
+            onClick={toggleHighlight}
+            title="Highlight"
+          >
+            <HighlightIcon size={14} />
+          </button>
+
+          <span className="fmt-sep" />
+
+          <button
+            type="button"
+            className={`fmt-btn${active.ul ? " is-active" : ""}`}
+            onClick={() => fmt("insertUnorderedList")}
+            title="Bullet list"
+          >
+            <ListBulletIcon size={14} />
+          </button>
+          <button
+            type="button"
+            className={`fmt-btn${active.ol ? " is-active" : ""}`}
+            onClick={() => fmt("insertOrderedList")}
+            title="Numbered list"
+          >
+            <ListOrderedIcon size={14} />
+          </button>
+
+          <span className="fmt-sep" />
+
+          <button
+            type="button"
+            className={`fmt-btn${active.link ? " is-active" : ""}`}
+            onClick={insertLink}
+            title="Insert / remove link"
+          >
+            <LinkIcon size={14} />
+          </button>
+
+          <span className="fmt-sep" />
+
+          <button
+            type="button"
+            className="fmt-btn"
+            onClick={() => fmt("removeFormat")}
+            title="Clear formatting"
+          >
+            <ClearFormatIcon size={14} />
+          </button>
+        </div>
+
         <div
           ref={editorRef}
           className="rich-body"

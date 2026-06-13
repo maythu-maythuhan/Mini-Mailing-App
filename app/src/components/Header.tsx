@@ -1,7 +1,8 @@
 import { useAuth } from "../auth/useAuth";
 import { useCampaign } from "../state/campaign";
+import { useTheme } from "../lib/useTheme";
 import { initials } from "../lib/validation";
-import { ClockIcon, GearIcon, LogoutIcon, StarIcon } from "./icons";
+import { ClockIcon, GearIcon, LogoutIcon, MoonIcon, StarIcon, SunIcon } from "./icons";
 
 export default function Header({
   onOpenHistory,
@@ -12,6 +13,7 @@ export default function Header({
 }) {
   const { user, signOut, isReal } = useAuth();
   const { history } = useCampaign();
+  const { theme, toggle } = useTheme();
 
   return (
     <header className="header">
@@ -27,6 +29,15 @@ export default function Header({
         </div>
 
         <div className="header__spacer" />
+
+        <button
+          className="iconbtn"
+          onClick={toggle}
+          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+        </button>
 
         {user && (
           <>
@@ -47,7 +58,10 @@ export default function Header({
               <span className="identity__meta">
                 <span className="identity__name">
                   {user.name}
-                  <span className={`mode-dot ${isReal ? "mode-dot--live" : "mode-dot--demo"}`} title={isReal ? "Live — real sending" : "Demo — simulated"} />
+                  <span
+                    className={`mode-dot ${isReal ? "mode-dot--live" : "mode-dot--demo"}`}
+                    title={isReal ? "Live — real sending" : "Demo — simulated"}
+                  />
                 </span>
                 <span className="identity__mail">{user.email}</span>
               </span>
