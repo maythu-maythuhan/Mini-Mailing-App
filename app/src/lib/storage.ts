@@ -37,6 +37,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // (~30/min) keeps the batch under that ceiling so messages aren't dropped.
   sendDelayMs: 2000,
   highVolumeThreshold: 50,
+  sendFromMailbox: "",
 };
 
 export const store = {

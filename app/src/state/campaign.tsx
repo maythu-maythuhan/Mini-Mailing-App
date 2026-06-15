@@ -377,6 +377,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
             attachments,
             cc: draft.cc,
             bcc: draft.bcc,
+            fromMailbox: settings.sendFromMailbox?.trim() || undefined,
           },
           token,
         );
@@ -417,7 +418,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
         startedAt,
         finishedAt: Date.now(),
         subject: draft.subject,
-        from: user.email,
+        from: settings.sendFromMailbox?.trim() || user.email,
         total,
         sent,
         failed,
@@ -428,7 +429,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
 
       runningRef.current = false;
     },
-    [user, recipients, draft, attachments, settings.sendDelayMs, updateRecipient, getAccessToken, notify],
+    [user, recipients, draft, attachments, settings.sendDelayMs, settings.sendFromMailbox, updateRecipient, getAccessToken, notify],
   );
 
   const pauseSend = useCallback(() => {

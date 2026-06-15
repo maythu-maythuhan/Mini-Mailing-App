@@ -15,7 +15,9 @@ import type { Attachment, GraphConfig, User } from "../types";
  *  - Redirect URI: this app's origin (e.g. http://localhost:5173)
  *  - Delegated Graph permissions: User.Read, Mail.Send
  */
-const SCOPES = ["User.Read", "Mail.Send"];
+// Mail.Send.Shared lets the signed-in user send from a shared mailbox they
+// have "Send As" / "Send on Behalf" rights to (in addition to their own).
+const SCOPES = ["User.Read", "Mail.Send", "Mail.Send.Shared"];
 
 let pca: PublicClientApplication | null = null;
 let configKey = "";
@@ -123,6 +125,7 @@ export async function sendViaGraph(
   attachments: Attachment[] = [],
   cc: string[] = [],
   bcc: string[] = [],
+  fromMailbox?: string,
 ): Promise<{ ok: boolean; error?: string }> {
   const isHtml = /<[a-z][\s\S]*>/i.test(body);
 
@@ -159,6 +162,14 @@ export async function sendViaGraph(
   if (cc.length > 0) message.ccRecipients = cc.map((a) => ({ emailAddress: { address: a } }));
   if (bcc.length > 0) message.bccRecipients = bcc.map((a) => ({ emailAddress: { address: a } }));
 
+  // Send FROM a shared mailbox when configured: target that mailbox's sendMail
+  // endpoint and set the From address. Requires Mail.Send.Shared + "Send As".
+  const shared = fromMailbox?.trim();
+  if (shared) message.from = { emailAddress: { address: shared } };
+  const endpoint = shared
+    ? `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(shared)}/sendMail`
+    : "https://graph.microsoft.com/v1.0/me/sendMail";
+
   const fileAttachments = attachments.map((a) => ({
     "@odata.type": "#microsoft.graph.fileAttachment",
     name: a.name,
@@ -178,7 +189,7 @@ export async function sendViaGraph(
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      const res = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

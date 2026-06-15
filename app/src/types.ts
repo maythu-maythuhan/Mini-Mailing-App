@@ -73,6 +73,12 @@ export interface Settings {
   sendDelayMs: number;
   /** Warn before sending to more than this many recipients. */
   highVolumeThreshold: number;
+  /**
+   * Optional shared mailbox to send FROM (e.g. "events@contoso.com"). Empty =
+   * send from the signed-in user's own mailbox. Requires the signed-in user to
+   * have "Send As" rights on the mailbox and the app to hold Mail.Send.Shared.
+   */
+  sendFromMailbox?: string;
 }
 
 /** Live progress while a Send All / retry run is in flight. */

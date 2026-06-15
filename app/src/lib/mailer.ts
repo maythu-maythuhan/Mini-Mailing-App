@@ -15,6 +15,8 @@ export interface SendPayload {
   attachments?: Attachment[];
   cc?: string;
   bcc?: string;
+  /** Optional shared mailbox to send FROM (empty = the signed-in user). */
+  fromMailbox?: string;
 }
 
 /**
@@ -46,6 +48,7 @@ export async function sendMail(
       payload.attachments ?? [],
       cc,
       bcc,
+      payload.fromMailbox,
     );
   }
 

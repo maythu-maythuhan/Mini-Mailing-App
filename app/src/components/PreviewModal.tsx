@@ -6,8 +6,9 @@ import { sendMail } from "../lib/mailer";
 import { ChevronIcon, PaperclipIcon, SendIcon, XIcon } from "./icons";
 
 export default function PreviewModal({ onClose }: { onClose: () => void }) {
-  const { draft, recipients, selectedId, setSelectedId, attachments, updateRecipient, notify } =
+  const { draft, recipients, selectedId, setSelectedId, attachments, settings, updateRecipient, notify } =
     useCampaign();
+  const fromMailbox = settings.sendFromMailbox?.trim() || "";
   const { user, getAccessToken } = useAuth();
   const [sending, setSending] = useState(false);
 
@@ -50,7 +51,10 @@ export default function PreviewModal({ onClose }: { onClose: () => void }) {
         notify("error", "Test send failed", "Reconnect your Microsoft account in Settings.");
         return;
       }
-      const res = await sendMail({ from: user, to: recipient, subject, body, attachments }, token);
+      const res = await sendMail(
+        { from: user, to: recipient, subject, body, attachments, fromMailbox: fromMailbox || undefined },
+        token,
+      );
       if (res.ok) {
         updateRecipient(recipient.id, { sendStatus: "sent", error: undefined });
         notify("success", "Test sent successfully", `Delivered to ${recipient.email}.`);
@@ -98,7 +102,16 @@ export default function PreviewModal({ onClose }: { onClose: () => void }) {
             <div className="mail__row">
               <span className="k">From</span>
               <span className="v">
-                {user.name} &lt;{user.email}&gt;
+                {fromMailbox ? (
+                  <>
+                    {fromMailbox}{" "}
+                    <span className="muted">(on behalf of {user.email})</span>
+                  </>
+                ) : (
+                  <>
+                    {user.name} &lt;{user.email}&gt;
+                  </>
+                )}
               </span>
             </div>
             <div className="mail__row">

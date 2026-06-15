@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCampaign } from "../state/campaign";
 import { useAuth } from "../auth/useAuth";
+import { isValidEmail } from "../lib/validation";
 import { CheckIcon, GearIcon, XIcon } from "./icons";
 
 function MsLogo({ size = 16 }: { size?: number }) {
@@ -90,6 +91,36 @@ export default function SettingsDrawer({ onClose }: { onClose: () => void }) {
               </>
             )}
           </div>
+
+          {/* Send-from (shared mailbox) */}
+          {configured && (
+            <div className="setrow">
+              <h3>Send from (shared mailbox)</h3>
+              <p>
+                Leave blank to send from your own mailbox. To send from a shared mailbox, enter its
+                address — you must have <b>Send As</b> rights on it.
+              </p>
+              <input
+                className="input"
+                type="email"
+                placeholder="events@yourcompany.com"
+                value={settings.sendFromMailbox ?? ""}
+                onChange={(e) => updateSettings({ sendFromMailbox: e.target.value })}
+                spellCheck={false}
+                autoComplete="off"
+              />
+              {settings.sendFromMailbox?.trim() && !isValidEmail(settings.sendFromMailbox.trim()) && (
+                <p className="muted" style={{ color: "var(--danger, #dc2626)", marginTop: 6 }}>
+                  That doesn't look like a valid email address.
+                </p>
+              )}
+              {settings.sendFromMailbox?.trim() && isValidEmail(settings.sendFromMailbox.trim()) && (
+                <p className="muted" style={{ marginTop: 6 }}>
+                  Emails will be sent as <b>{settings.sendFromMailbox.trim()}</b>.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Sending behaviour */}
           <div className="setrow">
