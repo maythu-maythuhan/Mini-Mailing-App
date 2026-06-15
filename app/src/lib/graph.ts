@@ -52,6 +52,13 @@ function accountToUser(account: AccountInfo): User {
   };
 }
 
+/** Trim and unwrap an address: "  Name <a@b.com> " -> "a@b.com". */
+function cleanAddress(raw: string): string {
+  const s = (raw ?? "").trim();
+  const angle = s.match(/<\s*([^>]+?)\s*>/);
+  return (angle ? angle[1] : s).trim();
+}
+
 /**
  * Begin interactive sign-in via full-page redirect. This navigates the whole
  * window to Microsoft and does not return — the result is picked up by
@@ -154,10 +161,16 @@ export async function sendViaGraph(
     );
   }
 
+  // Normalise the address: trim whitespace and strip any surrounding angle
+  // brackets / "Name <addr>" wrapping. A stray space or hidden character makes
+  // Graph reject the recipient as invalid — which looked like "personal
+  // (gmail/yahoo) addresses don't work" while clean Microsoft ones did.
+  const toAddr = cleanAddress(to.email);
+
   const message: Record<string, unknown> = {
     subject,
     body: { contentType: isHtml ? "HTML" : "Text", content },
-    toRecipients: [{ emailAddress: { address: to.email, name: to.name || undefined } }],
+    toRecipients: [{ emailAddress: { address: toAddr, name: to.name?.trim() || undefined } }],
   };
   if (cc.length > 0) message.ccRecipients = cc.map((a) => ({ emailAddress: { address: a } }));
   if (bcc.length > 0) message.bccRecipients = bcc.map((a) => ({ emailAddress: { address: a } }));
@@ -203,7 +216,9 @@ export async function sendViaGraph(
       let detail = `Graph error ${res.status}`;
       try {
         const data = await res.json();
-        detail = data?.error?.message || detail;
+        // Surface the Graph error code + message (e.g. "ErrorInvalidRecipients:
+        // …") so the real cause is visible, not just a generic failure.
+        detail = [data?.error?.code, data?.error?.message].filter(Boolean).join(": ") || detail;
       } catch {
         /* ignore parse */
       }
